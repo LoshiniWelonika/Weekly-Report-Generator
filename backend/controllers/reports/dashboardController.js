@@ -2,75 +2,108 @@ const WeeklyReport = require("../../models/WeeklyReport");
 const User = require("../../models/User");
 
 
-const getSummary = async (req, res) => {
+// Get Dashboard Summary
+const getDashboardSummary = async (req, res) => {
 
     try {
 
-        const {
-            weekStart,
-            weekEnd
-        } = req.query;
+        // Get current week dates
+        const today = new Date();
+
+        const weekStart = new Date(today);
+        weekStart.setDate(
+            today.getDate() - today.getDay() + 1
+        );
+
+        weekStart.setHours(0,0,0,0);
 
 
-        const reportFilter = {
-            status: "SUBMITTED"
-        };
+        const weekEnd = new Date(weekStart);
+
+        weekEnd.setDate(
+            weekStart.getDate() + 6
+        );
+
+        weekEnd.setHours(23,59,59,999);
 
 
-        if (weekStart && weekEnd) {
 
-            reportFilter.weekStart = {
-                $gte: new Date(weekStart),
-                $lte: new Date(weekEnd)
-            };
+        // Count managers should only see submitted reports
+        const totalReports = await WeeklyReport.countDocuments({
 
-        }
+            status: "SUBMITTED",
 
-
-        // Get submitted reports
-        const reports = await WeeklyReport.find(reportFilter);
-
-
-        // Total submitted reports
-        const totalReports = reports.length;
-
-
-        // Total members
-        const totalMembers = await User.countDocuments({
-            role: "MEMBER"
-        });
-
-
-        // Pending reports
-        const pendingReports =
-            totalMembers - totalReports;
-
-
-        // Compliance rate
-        const complianceRate =
-            totalMembers === 0
-                ? 0
-                : Math.round(
-                    (totalReports / totalMembers) * 100
-                );
-
-
-        // Count blockers
-        let openBlockers = 0;
-
-
-        reports.forEach(report => {
-
-            if(report.blockers){
-
-                openBlockers += report.blockers.length;
-
+            weekStart:{
+                $gte: weekStart,
+                $lte: weekEnd
             }
 
         });
 
 
+
+        // Count total team members
+        const totalMembers = await User.countDocuments({
+
+            role:"MEMBER"
+
+        });
+
+
+
+        // Calculate pending reports
+
+        const pendingReports =
+            totalMembers - totalReports;
+
+
+
+        // Compliance percentage
+
+        let complianceRate = 0;
+
+
+        if(totalMembers > 0){
+
+            complianceRate =
+                ((totalReports / totalMembers) * 100)
+                .toFixed(2);
+
+        }
+
+
+
+        // Calculate blockers
+
+        const reports =
+            await WeeklyReport.find({
+
+                status:"SUBMITTED",
+
+                weekStart:{
+                    $gte: weekStart,
+                    $lte: weekEnd
+                }
+
+            });
+
+
+
+        let openBlockers = 0;
+
+
+        reports.forEach(report=>{
+
+            openBlockers += report.blockers.length;
+
+        });
+
+
+
         res.json({
+
+            weekStart,
+            weekEnd,
 
             totalReports,
 
@@ -83,19 +116,21 @@ const getSummary = async (req, res) => {
         });
 
 
-    } catch(error) {
 
+    } catch(error){
 
         res.status(500).json({
-            message:error.message
-        });
 
+            message:error.message
+
+        });
 
     }
 
 };
 
 
+
 module.exports = {
-    getSummary
+    getDashboardSummary
 };
