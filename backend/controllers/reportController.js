@@ -1,19 +1,37 @@
 const WeeklyReport = require("../models/WeeklyReport");
-
+const dayjs = require("dayjs");
 
 // Create Report
 const createReport = async (req,res)=>{
-
     try{
 
-        const report = await WeeklyReport.create({
-
-            user:req.user._id,
-
-            ...req.body
-
+        const existingReport = await WeeklyReport.findOne({
+        user: req.user._id,
+        weekStart: req.body.weekStart,
+        weekEnd: req.body.weekEnd
         });
 
+
+        if (existingReport) {
+            return res.status(400).json({
+                message: "A report for this week already exists."
+            });
+        }
+        
+
+         const deadline = dayjs(req.body.weekStart)
+            .add(4, "day") // Friday
+            .hour(18)
+            .minute(0)
+            .second(0)
+            .millisecond(0)
+            .toDate(); 
+
+        const report = await WeeklyReport.create({
+            user:req.user._id,
+            deadline,
+            ...req.body
+        });
 
         res.status(201).json({
 

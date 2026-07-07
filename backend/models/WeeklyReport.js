@@ -25,6 +25,11 @@ const weeklyReportSchema = new mongoose.Schema(
             required: true
         },
 
+        deadline: {
+            type: Date,
+            required: true
+        },
+
         tasksCompleted: [
             {
                 type: String
