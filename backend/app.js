@@ -2,13 +2,26 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+
+const authRoutes = require("./routes/authRoutes");
+const testRoutes = require("./routes/testRoutes");
+
 const app = express();
 
 app.use(cors());
+
 app.use(express.json());
 
-app.get("/", (req, res) => {
+
+// Routes
+app.use("/api/auth", authRoutes);
+
+app.use("/api/test", testRoutes);
+
+
+app.get("/", (req,res)=>{
     res.send("Weekly Report API is running...");
 });
+
 
 module.exports = app;
