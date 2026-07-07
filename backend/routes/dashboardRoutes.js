@@ -1,7 +1,7 @@
 const express = require("express");
 
 const {
-    getDashboardSummary, getTasksTrend
+    getDashboardSummary, getTasksTrend, getSubmissionStatus
 } = require("../controllers/reports/dashboardController");
 
 
@@ -29,6 +29,11 @@ router.get(
     getTasksTrend
 );
 
-
+router.get(
+    "/submission-status",
+    protect,
+    authorizeRoles("MANAGER"),
+    getSubmissionStatus
+);
 
 module.exports = router;

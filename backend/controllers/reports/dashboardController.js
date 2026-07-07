@@ -201,8 +201,147 @@ const getTasksTrend = async (req, res) => {
 };
 
 
+// Get Submission Status
+const getSubmissionStatus = async (req, res) => {
+
+    try {
+
+        const today = new Date();
+
+
+        // Calculate current week
+        const weekStart = new Date(today);
+
+        weekStart.setDate(
+            today.getDate() - today.getDay() + 1
+        );
+
+        weekStart.setHours(0,0,0,0);
+
+
+
+        const weekEnd = new Date(weekStart);
+
+        weekEnd.setDate(
+            weekStart.getDate() + 6
+        );
+
+        weekEnd.setHours(23,59,59,999);
+
+
+
+        // Get all members
+        const members = await User.find({
+            role:"MEMBER"
+        });
+
+
+
+        // Get submitted reports
+        const submittedReports =
+            await WeeklyReport.find({
+
+                status:"SUBMITTED",
+
+                weekStart:{
+                    $gte: weekStart,
+                    $lte: weekEnd
+                }
+
+            });
+
+
+
+        const submittedUsers =
+            submittedReports.map(
+                report => report.user.toString()
+            );
+
+
+
+        let submitted = 0;
+        let pending = 0;
+        let late = 0;
+
+
+
+        members.forEach(member => {
+
+
+            const hasSubmitted =
+                submittedUsers.includes(
+                    member._id.toString()
+                );
+
+
+
+            if(hasSubmitted){
+
+                submitted++;
+
+            }
+            else {
+
+
+                // Check deadline
+
+                const deadline =
+                    new Date(weekEnd);
+
+
+                deadline.setHours(
+                    18,
+                    0,
+                    0,
+                    0
+                );
+
+
+                if(today > deadline){
+
+                    late++;
+
+                }
+                else{
+
+                    pending++;
+
+                }
+
+            }
+
+
+        });
+
+
+
+        res.json({
+
+            submitted,
+
+            pending,
+
+            late,
+
+            totalMembers: members.length
+
+        });
+
+
+
+    } catch(error){
+
+        res.status(500).json({
+            message:error.message
+        });
+
+    }
+
+};
+
 
 module.exports = {
     getDashboardSummary,
-    getTasksTrend
+    getTasksTrend,
+    getSubmissionStatus
 };
