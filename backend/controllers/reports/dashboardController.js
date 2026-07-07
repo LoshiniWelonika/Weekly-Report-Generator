@@ -414,9 +414,77 @@ const getProjectWorkload = async (req, res) => {
 };
 
 
+// Get Recent Activity
+const getRecentActivity = async (req, res) => {
+
+    try {
+
+        const reports = await WeeklyReport
+            .find({
+                status: "SUBMITTED"
+            })
+            .populate(
+                "user",
+                "name email"
+            )
+            .populate(
+                "project",
+                "name"
+            )
+            .sort({
+                submittedAt: -1
+            })
+            .limit(10);
+
+
+
+        const activities = reports.map(report => {
+
+
+            return {
+
+                user: report.user.name,
+
+                email: report.user.email,
+
+                action: "Submitted weekly report",
+
+                project: report.project
+                    ? report.project.name
+                    : "No project",
+
+                date: report.submittedAt
+
+            };
+
+
+        });
+
+
+
+        res.json(activities);
+
+
+
+    } catch(error) {
+
+
+        res.status(500).json({
+
+            message:error.message
+
+        });
+
+
+    }
+
+};
+
+
 module.exports = {
     getDashboardSummary,
     getTasksTrend,
     getSubmissionStatus,
-    getProjectWorkload
+    getProjectWorkload,
+    getRecentActivity
 };

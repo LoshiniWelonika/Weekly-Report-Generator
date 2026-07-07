@@ -4,7 +4,8 @@ const {
     getDashboardSummary, 
     getTasksTrend, 
     getSubmissionStatus,
-    getProjectWorkload
+    getProjectWorkload,
+    getRecentActivity
 } = require("../controllers/reports/dashboardController");
 
 
@@ -44,6 +45,13 @@ router.get(
     protect,
     authorizeRoles("MANAGER"),
     getProjectWorkload
+);
+
+router.get(
+    "/recent-activity",
+    protect,
+    authorizeRoles("MANAGER"),
+    getRecentActivity
 );
 
 module.exports = router;
