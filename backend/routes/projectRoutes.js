@@ -6,7 +6,7 @@ const {
     getProjectById,
     updateProject,
     deleteProject
-} = require("../controllers/projectController");
+} = require("../controllers/projects/projectController");
 
 
 const {

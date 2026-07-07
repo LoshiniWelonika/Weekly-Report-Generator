@@ -1,4 +1,4 @@
-const WeeklyReport = require("../models/WeeklyReport");
+const WeeklyReport = require("../../models/WeeklyReport");
 const dayjs = require("dayjs");
 
 // Create Report

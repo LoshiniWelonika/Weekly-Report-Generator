@@ -8,7 +8,7 @@ getAllReports,
 getReportById,
 updateReport,
 submitReport
-}=require("../controllers/reportController");
+}=require("../controllers/reports/reportController");
 
 
 const {
