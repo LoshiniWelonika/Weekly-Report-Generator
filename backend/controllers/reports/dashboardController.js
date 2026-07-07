@@ -1,5 +1,6 @@
 const WeeklyReport = require("../../models/WeeklyReport");
 const User = require("../../models/User");
+const Project = require("../../models/Project");
 
 
 // Get Dashboard Summary
@@ -339,9 +340,83 @@ const getSubmissionStatus = async (req, res) => {
 
 };
 
+// Get Project Workload
+const getProjectWorkload = async (req, res) => {
+
+    try {
+
+        const reports = await WeeklyReport.find({
+            status: "SUBMITTED"
+        })
+        .populate("project");
+
+
+        const workload = {};
+
+
+        reports.forEach(report => {
+
+
+            if (!report.project) {
+                return;
+            }
+
+
+            const projectName =
+                report.project.name;
+
+
+            const taskCount =
+                report.tasksCompleted.length;
+
+
+
+            if (!workload[projectName]) {
+
+                workload[projectName] = 0;
+
+            }
+
+
+            workload[projectName] += taskCount;
+
+
+        });
+
+
+
+        const result =
+            Object.keys(workload).map(project => ({
+
+                project,
+
+                tasksCompleted:
+                    workload[project]
+
+            }));
+
+
+        res.json(result);
+
+
+
+    } catch(error) {
+
+
+        res.status(500).json({
+
+            message:error.message
+
+        });
+
+    }
+
+};
+
 
 module.exports = {
     getDashboardSummary,
     getTasksTrend,
-    getSubmissionStatus
+    getSubmissionStatus,
+    getProjectWorkload
 };
