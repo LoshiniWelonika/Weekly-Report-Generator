@@ -1,7 +1,7 @@
 const express = require("express");
 
 const {
-    getDashboardSummary
+    getDashboardSummary, getTasksTrend
 } = require("../controllers/reports/dashboardController");
 
 
@@ -20,6 +20,13 @@ router.get(
     protect,
     authorizeRoles("MANAGER"),
     getDashboardSummary
+);
+
+router.get(
+    "/tasks-trend",
+    protect,
+    authorizeRoles("MANAGER"),
+    getTasksTrend
 );
 
 

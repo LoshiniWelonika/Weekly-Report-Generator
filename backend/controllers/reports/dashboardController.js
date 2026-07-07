@@ -129,8 +129,80 @@ const getDashboardSummary = async (req, res) => {
 
 };
 
+// Get Tasks Completed Trend
+const getTasksTrend = async (req, res) => {
+
+    try {
+
+        const reports = await WeeklyReport.find({
+            status: "SUBMITTED"
+        })
+        .sort({
+            weekStart: 1
+        });
+
+
+
+        const trend = {};
+
+
+
+        reports.forEach(report => {
+
+            const week =
+                report.weekStart
+                .toISOString()
+                .split("T")[0];
+
+
+            const taskCount =
+                report.tasksCompleted.length;
+
+
+
+            if (!trend[week]) {
+
+                trend[week] = 0;
+
+            }
+
+
+            trend[week] += taskCount;
+
+
+        });
+
+
+
+        const result =
+            Object.keys(trend).map(week => ({
+
+                week,
+
+                tasksCompleted:
+                    trend[week]
+
+            }));
+
+
+
+        res.json(result);
+
+
+
+    } catch(error) {
+
+        res.status(500).json({
+            message:error.message
+        });
+
+    }
+
+};
+
 
 
 module.exports = {
-    getDashboardSummary
+    getDashboardSummary,
+    getTasksTrend
 };
