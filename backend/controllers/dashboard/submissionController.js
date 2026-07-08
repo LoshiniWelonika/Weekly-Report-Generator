@@ -24,7 +24,8 @@ const getSubmissionStatus = async (req, res) => {
 
 
         const submittedReports =
-            await WeeklyReport.find(filter);
+            await WeeklyReport.find(filter)
+                .populate("user", "name email");
 
 
 
@@ -43,6 +44,15 @@ const getSubmissionStatus = async (req, res) => {
         let submitted = 0;
         let pending = 0;
         let late = 0;
+
+        const memberBreakdown = members.map(member => ({
+            memberId: member._id.toString(),
+            member: member.name,
+            email: member.email,
+            submitted: false,
+            pending: false,
+            late: false
+        }));
 
 
 
@@ -70,15 +80,33 @@ const getSubmissionStatus = async (req, res) => {
 
                 submitted++;
 
+                const entry = memberBreakdown.find(item => item.memberId === member._id.toString());
+
+                if (entry) {
+                    entry.submitted = true;
+                }
+
             }
             else if(today > deadline){
 
                 late++;
 
+                const entry = memberBreakdown.find(item => item.memberId === member._id.toString());
+
+                if (entry) {
+                    entry.late = true;
+                }
+
             }
             else{
 
                 pending++;
+
+                const entry = memberBreakdown.find(item => item.memberId === member._id.toString());
+
+                if (entry) {
+                    entry.pending = true;
+                }
 
             }
 
@@ -98,7 +126,8 @@ const getSubmissionStatus = async (req, res) => {
 
                 late,
 
-                totalMembers: members.length
+                totalMembers: members.length,
+                memberBreakdown
 
             }
 

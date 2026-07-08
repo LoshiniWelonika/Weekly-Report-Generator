@@ -8,9 +8,10 @@ const getProjectWorkload = async (req, res) => {
         const { filter } = buildReportFilter(req.query);
 
         const reports = await WeeklyReport.find(filter)
-            .populate("project", "name");
+            .populate("project", "name")
+            .populate("user", "name email");
 
-        const workload = {};
+        const workload = new Map();
 
         reports.forEach(report => {
 
@@ -19,24 +20,47 @@ const getProjectWorkload = async (req, res) => {
             }
 
             const projectName = report.project.name;
+            const projectId = report.project._id.toString();
 
             const taskCount =
                 report.tasksCompleted?.length || 0;
 
-            if (!workload[projectName]) {
-                workload[projectName] = 0;
+            if (!workload.has(projectId)) {
+                workload.set(projectId, {
+                    project: projectName,
+                    projectId,
+                    tasksCompleted: 0,
+                    reports: 0,
+                    members: new Map()
+                });
             }
 
-            workload[projectName] += taskCount;
+            const bucket = workload.get(projectId);
+            bucket.tasksCompleted += taskCount;
+            bucket.reports += 1;
+
+            if (report.user?._id) {
+                const memberId = report.user._id.toString();
+                const memberBucket = bucket.members.get(memberId) || {
+                    memberId,
+                    member: report.user.name || "Unknown User",
+                    tasksCompleted: 0,
+                    reports: 0
+                };
+
+                memberBucket.tasksCompleted += taskCount;
+                memberBucket.reports += 1;
+                bucket.members.set(memberId, memberBucket);
+            }
 
         });
 
-        const result = Object.keys(workload).map(project => ({
-
-            project,
-
-            tasksCompleted: workload[project]
-
+        const result = Array.from(workload.values()).map((bucket) => ({
+            project: bucket.project,
+            projectId: bucket.projectId,
+            tasksCompleted: bucket.tasksCompleted,
+            reports: bucket.reports,
+            members: Array.from(bucket.members.values())
         }));
 
         res.json({
