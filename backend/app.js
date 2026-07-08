@@ -2,6 +2,11 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
+const {
+    notFound,
+    errorHandler
+} = require("./middleware/errorMiddleware");
+
 
 const authRoutes = require("./routes/authRoutes");
 const testRoutes = require("./routes/testRoutes");
@@ -27,6 +32,9 @@ app.use( "/api/projects", projectRoutes);
 app.use( "/api/reports", reportRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 app.get("/", (req,res)=>{
     res.send("Weekly Report API is running...");
