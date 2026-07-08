@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Box, Button, Card, CardContent, Divider, Link, Stack, TextField, Typography } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { loginUser } from "../api/authApi";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../context/useAuth";
 
 const Login = () => {
     const [email, setEmail] = useState("");

@@ -18,7 +18,7 @@ import theme from "./utils/theme";
 
 import {
     AuthProvider
-} from "./context/AuthContext";
+} from "./context/AuthContext.jsx";
 
 
 

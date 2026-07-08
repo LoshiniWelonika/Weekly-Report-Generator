@@ -1,6 +1,6 @@
 import { AppBar, Avatar, Box, Button, Chip, IconButton, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../context/useAuth";
 
 const Navbar = ({ onMenuClick }) => {
     const { user, logout } = useAuth();

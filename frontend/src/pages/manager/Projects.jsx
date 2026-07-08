@@ -24,7 +24,11 @@ const ManagerProjects = () => {
     };
 
     useEffect(() => {
-        loadProjects();
+        const loadInitialProjects = async () => {
+            await loadProjects();
+        };
+
+        void loadInitialProjects();
     }, []);
 
     const openCreateDialog = () => {
@@ -89,7 +93,11 @@ const ManagerProjects = () => {
                 {projects.map((project) => (
                     <Card key={project._id}>
                         <CardContent>
-                            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="space-between" alignItems={{ sm: "center" }}>
+                            <Stack
+                                direction={{ xs: "column", sm: "row" }}
+                                spacing={2}
+                                sx={{ justifyContent: "space-between", alignItems: { sm: "center" } }}
+                            >
                                 <Box>
                                     <Typography variant="h6">{project.name}</Typography>
                                     <Typography color="text.secondary">{project.description || "No description"}</Typography>

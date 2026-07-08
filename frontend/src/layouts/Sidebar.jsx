@@ -1,10 +1,10 @@
-import { Box, Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material";
+import { Box, Divider, Drawer, List, ListItemButton, ListItemIcon, Toolbar, Typography } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import FolderIcon from "@mui/icons-material/Folder";
 import ArticleIcon from "@mui/icons-material/Article";
 import { NavLink, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../context/useAuth";
 
 const drawerWidth = 260;
 
@@ -62,7 +62,7 @@ const Sidebar = ({ mobileOpen, onMobileClose }) => {
                             <ListItemIcon sx={{ minWidth: 40, color: selected ? "primary.main" : "text.secondary" }}>
                                 {item.icon}
                             </ListItemIcon>
-                            <ListItemText primary={item.text} primaryTypographyProps={{ fontWeight: 600 }} />
+                            <Typography sx={{ fontWeight: 600 }}>{item.text}</Typography>
                         </ListItemButton>
                     );
                 })}
@@ -81,14 +81,17 @@ const Sidebar = ({ mobileOpen, onMobileClose }) => {
             >
                 {drawerContent}
             </Drawer>
-            <Drawer
+           <Drawer
                 variant="permanent"
                 sx={{
                     display: { xs: "none", md: "block" },
+                    zIndex: (theme) => theme.zIndex.appBar - 1, // sit BELOW the navbar, not above it
                     "& .MuiDrawer-paper": {
                         width: drawerWidth,
                         boxSizing: "border-box",
                         borderRight: "1px solid rgba(15,23,42,0.08)",
+                        top: "64px", // push drawer paper down below the AppBar height
+                        height: "calc(100% - 64px)",
                     },
                 }}
                 open
