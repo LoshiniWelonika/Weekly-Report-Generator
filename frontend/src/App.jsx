@@ -15,6 +15,8 @@ import MainLayout from "./layouts/MainLayout";
 
 import CreateReport from "./pages/member/CreateReport";
 
+import ReportHistory from "./pages/member/ReportHistory";
+
 import Unauthorized from "./pages/Unauthorized";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -108,6 +110,27 @@ path="/member/reports/create"
     </ProtectedRoute>
 
     }
+
+/>
+
+
+<Route
+
+        path="/member/reports"
+
+        element={
+
+        <ProtectedRoute role="MEMBER">
+
+        <MainLayout>
+
+        <ReportHistory />
+
+        </MainLayout>
+
+        </ProtectedRoute>
+
+        }
 
 />
 
