@@ -1,12 +1,24 @@
 const express = require("express");
 
 const {
-    getDashboardSummary, 
-    getTasksTrend, 
-    getSubmissionStatus,
-    getProjectWorkload,
+    getDashboardSummary
+} = require("../controllers/dashboard/summaryController");
+
+const {
+    getTasksTrend
+} = require("../controllers/dashboard/trendController");
+
+const {
+    getSubmissionStatus
+} = require("../controllers/dashboard/submissionController");
+
+const {
+    getProjectWorkload
+} = require("../controllers/dashboard/workloadController");
+
+const {
     getRecentActivity
-} = require("../controllers/reports/dashboardController");
+} = require("../controllers/dashboard/activityController");
 
 
 const {
