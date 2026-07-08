@@ -1,6 +1,57 @@
 const WeeklyReport = require("../../models/WeeklyReport");
 const User = require("../../models/User");
-const Project = require("../../models/Project");
+
+
+const buildReportFilter = (query) => {
+
+    let { weekStart, weekEnd, project, member } = query;
+
+    if (!weekStart || !weekEnd) {
+
+        const today = new Date();
+
+        const start = new Date(today);
+        start.setDate(today.getDate() - today.getDay() + 1);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+
+        weekStart = start;
+        weekEnd = end;
+
+    } else {
+
+        weekStart = new Date(weekStart);
+        weekStart.setHours(0, 0, 0, 0);
+
+        weekEnd = new Date(weekEnd);
+        weekEnd.setHours(23, 59, 59, 999);
+
+    }
+
+    const filter = {
+        status: "SUBMITTED",
+        weekStart,
+        weekEnd
+    };
+
+    if (project) {
+        filter.project = project;
+    }
+
+    if (member) {
+        filter.user = member;
+    }
+
+    return {
+        filter,
+        weekStart,
+        weekEnd
+    };
+
+};
 
 
 // Get Dashboard Summary
@@ -8,39 +59,16 @@ const getDashboardSummary = async (req, res) => {
 
     try {
 
-        // Get current week dates
-        const today = new Date();
-
-        const weekStart = new Date(today);
-        weekStart.setDate(
-            today.getDate() - today.getDay() + 1
-        );
-
-        weekStart.setHours(0,0,0,0);
-
-
-        const weekEnd = new Date(weekStart);
-
-        weekEnd.setDate(
-            weekStart.getDate() + 6
-        );
-
-        weekEnd.setHours(23,59,59,999);
+        const {
+            filter,
+            weekStart,
+            weekEnd
+        } = buildReportFilter(req.query);
 
 
 
         // Count managers should only see submitted reports
-        const totalReports = await WeeklyReport.countDocuments({
-
-            status: "SUBMITTED",
-
-            weekStart:{
-                $gte: weekStart,
-                $lte: weekEnd
-            }
-
-        });
-
+        const totalReports = await WeeklyReport.countDocuments(filter);
 
 
         // Count total team members
@@ -77,25 +105,16 @@ const getDashboardSummary = async (req, res) => {
         // Calculate blockers
 
         const reports =
-            await WeeklyReport.find({
-
-                status:"SUBMITTED",
-
-                weekStart:{
-                    $gte: weekStart,
-                    $lte: weekEnd
-                }
-
-            });
+            await WeeklyReport.find(filter);
 
 
 
         let openBlockers = 0;
 
 
-        reports.forEach(report=>{
+        reports.forEach(report => {
 
-            openBlockers += report.blockers.length;
+            openBlockers += report.blockers?.length || 0;
 
         });
 
@@ -103,16 +122,23 @@ const getDashboardSummary = async (req, res) => {
 
         res.json({
 
-            weekStart,
-            weekEnd,
+            success:true,
 
-            totalReports,
+            data:{
 
-            pendingReports,
+                weekStart,
 
-            complianceRate,
+                weekEnd,
 
-            openBlockers
+                totalReports,
+
+                pendingReports,
+
+                complianceRate,
+
+                openBlockers
+
+            }
 
         });
 
@@ -122,7 +148,9 @@ const getDashboardSummary = async (req, res) => {
 
         res.status(500).json({
 
-            message:error.message
+            success: false,
+
+            message: error.message
 
         });
 
@@ -135,13 +163,13 @@ const getTasksTrend = async (req, res) => {
 
     try {
 
-        const reports = await WeeklyReport.find({
-            status: "SUBMITTED"
-        })
-        .sort({
-            weekStart: 1
-        });
+        const { filter } = buildReportFilter(req.query);
 
+        const reports = await WeeklyReport.find(filter)
+        .sort({
+            weekStart:1
+        });
+        
 
 
         const trend = {};
@@ -194,7 +222,11 @@ const getTasksTrend = async (req, res) => {
     } catch(error) {
 
         res.status(500).json({
+
+            success:false,
+
             message:error.message
+
         });
 
     }
@@ -211,23 +243,11 @@ const getSubmissionStatus = async (req, res) => {
 
 
         // Calculate current week
-        const weekStart = new Date(today);
-
-        weekStart.setDate(
-            today.getDate() - today.getDay() + 1
-        );
-
-        weekStart.setHours(0,0,0,0);
-
-
-
-        const weekEnd = new Date(weekStart);
-
-        weekEnd.setDate(
-            weekStart.getDate() + 6
-        );
-
-        weekEnd.setHours(23,59,59,999);
+        const {
+            filter,
+            weekStart,
+            weekEnd
+        } = buildReportFilter(req.query);
 
 
 
@@ -240,16 +260,7 @@ const getSubmissionStatus = async (req, res) => {
 
         // Get submitted reports
         const submittedReports =
-            await WeeklyReport.find({
-
-                status:"SUBMITTED",
-
-                weekStart:{
-                    $gte: weekStart,
-                    $lte: weekEnd
-                }
-
-            });
+            await WeeklyReport.find(filter);
 
 
 
@@ -333,7 +344,11 @@ const getSubmissionStatus = async (req, res) => {
     } catch(error){
 
         res.status(500).json({
+
+            success:false,
+
             message:error.message
+
         });
 
     }
@@ -345,9 +360,9 @@ const getProjectWorkload = async (req, res) => {
 
     try {
 
-        const reports = await WeeklyReport.find({
-            status: "SUBMITTED"
-        })
+        const { filter } = buildReportFilter(req.query);
+
+        const reports = await WeeklyReport.find(filter)
         .populate("project");
 
 
@@ -401,9 +416,9 @@ const getProjectWorkload = async (req, res) => {
 
 
     } catch(error) {
+            res.status(500).json({
 
-
-        res.status(500).json({
+            success:false,
 
             message:error.message
 
@@ -419,23 +434,15 @@ const getRecentActivity = async (req, res) => {
 
     try {
 
-        const reports = await WeeklyReport
-            .find({
-                status: "SUBMITTED"
-            })
-            .populate(
-                "user",
-                "name email"
-            )
-            .populate(
-                "project",
-                "name"
-            )
+        const { filter } = buildReportFilter(req.query);
+
+        const reports = await WeeklyReport.find(filter)
+            .populate("user", "name email")
+            .populate("project", "name")
             .sort({
                 submittedAt: -1
             })
             .limit(10);
-
 
 
         const activities = reports.map(report => {
@@ -470,6 +477,8 @@ const getRecentActivity = async (req, res) => {
 
 
         res.status(500).json({
+
+            success:false,
 
             message:error.message
 
