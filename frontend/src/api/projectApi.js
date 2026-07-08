@@ -1,13 +1,11 @@
 import api from "./axios";
 
+export const getProjects = () => api.get("/projects");
 
-// Get all projects
-export const getProjects = async () => {
+export const getProjectById = (id) => api.get(`/projects/${id}`);
 
-    const response = await api.get(
-        "/projects"
-    );
+export const createProject = (data) => api.post("/projects", data);
 
-    return response.data;
+export const updateProject = (id, data) => api.put(`/projects/${id}`, data);
 
-};
+export const deleteProject = (id) => api.delete(`/projects/${id}`);

@@ -1,53 +1,13 @@
-import API from "./axios";
+import api from "./axios";
 
+export const createReport = (data) => api.post("/reports", data);
 
-// Create weekly report
-export const createReport = (data) => {
+export const getMyReports = () => api.get("/reports/my");
 
-    return API.post(
-        "/reports",
-        data
-    );
+export const getAllReports = () => api.get("/reports");
 
-};
+export const getReportById = (id) => api.get(`/reports/${id}`);
 
+export const updateReport = (id, data) => api.put(`/reports/${id}`, data);
 
-// Get my reports
-export const getMyReports = () => {
-
-    return API.get(
-        "/reports/my"
-    );
-
-};
-
-
-// Get single report
-export const getReportById = (id) => {
-
-    return API.get(
-        `/reports/${id}`
-    );
-
-};
-
-
-// Update report
-export const updateReport = (id, data) => {
-
-    return API.put(
-        `/reports/${id}`,
-        data
-    );
-
-};
-
-
-// Submit report
-export const submitReport = (id) => {
-
-    return API.patch(
-        `/reports/${id}/submit`
-    );
-
-};
+export const submitReport = (id) => api.put(`/reports/${id}/submit`);

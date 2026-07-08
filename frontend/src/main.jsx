@@ -9,6 +9,7 @@ import {
 import {
     ThemeProvider
 } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
 
 import App from "./App";
@@ -29,6 +30,8 @@ ReactDOM.createRoot(
     <React.StrictMode>
 
         <ThemeProvider theme={theme}>
+
+            <CssBaseline />
 
             <AuthProvider>
 
