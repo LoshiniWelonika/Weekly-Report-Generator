@@ -3,55 +3,163 @@ const dayjs = require("dayjs");
 
 // Create Report
 const createReport = async (req,res)=>{
+
     try{
 
-        const existingReport = await WeeklyReport.findOne({
-        user: req.user._id,
-        weekStart: req.body.weekStart,
-        weekEnd: req.body.weekEnd
+
+        const weekStart =
+            new Date(req.body.weekStart);
+
+
+        weekStart.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+
+        const weekEnd =
+            new Date(req.body.weekEnd);
+
+
+        weekEnd.setHours(
+            23,
+            59,
+            59,
+            999
+        );
+
+
+
+
+
+        const existingReport =
+        await WeeklyReport.findOne({
+
+            user:req.user._id,
+
+            weekStart:{
+                $gte:weekStart,
+                $lte:weekStart
+            },
+
+
+            weekEnd:{
+                $gte:weekEnd,
+                $lte:weekEnd
+            }
+
         });
 
 
-        if (existingReport) {
-            return res.status(400).json({
-                message: "A report for this week already exists."
-            });
-        }
-        
 
-         const deadline = dayjs(req.body.weekStart)
-            .add(4, "day") // Friday
+
+
+        if(existingReport){
+
+            return res.status(400).json({
+
+                message:
+                "A report for this week already exists."
+
+            });
+
+        }
+
+
+
+
+
+        const deadline =
+            dayjs(weekStart)
+            .add(4,"day")
             .hour(18)
             .minute(0)
             .second(0)
             .millisecond(0)
-            .toDate(); 
+            .toDate();
 
-        const report = await WeeklyReport.create({
+
+
+
+
+
+        const report =
+        await WeeklyReport.create({
+
+
             user:req.user._id,
-            deadline,
-            ...req.body
+
+
+            project:req.body.project,
+
+
+            weekStart,
+
+
+            weekEnd,
+
+
+            tasksCompleted:
+                req.body.tasksCompleted,
+
+
+            tasksPlanned:
+                req.body.tasksPlanned,
+
+
+            blockers:
+                req.body.blockers || [],
+
+
+            hoursWorked:
+                req.body.hoursWorked,
+
+
+            notes:
+                req.body.notes,
+
+
+
+            deadline
+
+
         });
+
+
+
+
+
 
         res.status(201).json({
 
-            message:"Report created successfully",
+            message:
+            "Report created successfully",
+
 
             report
 
         });
 
 
-    }catch(error){
+
+    }
+    catch(error){
+
 
         res.status(500).json({
+
             message:error.message
+
         });
+
 
     }
 
-};
 
+};
 
 
 

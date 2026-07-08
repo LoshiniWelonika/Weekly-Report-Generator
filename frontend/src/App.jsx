@@ -13,6 +13,8 @@ import ManagerDashboard from "./pages/manager/ManagerDashboard";
 
 import MainLayout from "./layouts/MainLayout";
 
+import CreateReport from "./pages/member/CreateReport";
+
 import Unauthorized from "./pages/Unauthorized";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -86,6 +88,26 @@ return (
     path="/unauthorized"
 
     element={<Unauthorized />}
+
+/>
+
+<Route
+
+path="/member/reports/create"
+
+    element={
+
+    <ProtectedRoute role="MEMBER">
+
+    <MainLayout>
+
+    <CreateReport />
+
+    </MainLayout>
+
+    </ProtectedRoute>
+
+    }
 
 />
 
