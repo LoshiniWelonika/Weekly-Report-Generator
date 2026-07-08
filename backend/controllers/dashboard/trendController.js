@@ -8,73 +8,58 @@ const getTasksTrend = async (req, res) => {
         const { filter } = buildReportFilter(req.query);
 
         const reports = await WeeklyReport.find(filter)
-        .sort({
-            weekStart:1
-        });
-        
-
+            .sort({
+                weekStart: 1
+            });
 
         const trend = {};
 
-
-
         reports.forEach(report => {
 
-            const week =
-                report.weekStart
+            const week = report.weekStart
                 .toISOString()
                 .split("T")[0];
 
-
             const taskCount =
-                report.tasksCompleted.length;
-
-
+                report.tasksCompleted?.length || 0;
 
             if (!trend[week]) {
-
                 trend[week] = 0;
-
             }
-
 
             trend[week] += taskCount;
 
+        });
+
+        const result = Object.keys(trend).map(week => ({
+
+            week,
+
+            tasksCompleted: trend[week]
+
+        }));
+
+        res.json({
+
+            success: true,
+
+            data: result
 
         });
 
-
-
-        const result =
-            Object.keys(trend).map(week => ({
-
-                week,
-
-                tasksCompleted:
-                    trend[week]
-
-            }));
-
-
-
-        res.json(result);
-
-
-
-    } catch(error) {
+    } catch (error) {
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 
     }
 
 };
-
 
 module.exports = {
     getTasksTrend

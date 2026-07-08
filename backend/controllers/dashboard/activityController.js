@@ -1,19 +1,26 @@
 const WeeklyReport = require("../../models/WeeklyReport");
 const buildReportFilter = require("./filterHelper");
 
+
 const getRecentActivity = async (req, res) => {
 
     try {
 
         const { filter } = buildReportFilter(req.query);
 
+
         const reports = await WeeklyReport.find(filter)
+
             .populate("user", "name email")
+
             .populate("project", "name")
+
             .sort({
                 submittedAt: -1
             })
+
             .limit(10);
+
 
 
         const activities = reports.map(report => {
@@ -21,17 +28,27 @@ const getRecentActivity = async (req, res) => {
 
             return {
 
-                user: report.user.name,
+                user: report.user
+                    ? report.user.name
+                    : "Unknown User",
 
-                email: report.user.email,
+
+                email: report.user
+                    ? report.user.email
+                    : "Unknown Email",
+
 
                 action: "Submitted weekly report",
+
 
                 project: report.project
                     ? report.project.name
                     : "No project",
 
+
                 date: report.submittedAt
+                    ? report.submittedAt.toISOString().split("T")[0]
+                    : null
 
             };
 
@@ -40,7 +57,13 @@ const getRecentActivity = async (req, res) => {
 
 
 
-        res.json(activities);
+        res.json({
+
+            success:true,
+
+            data:activities
+
+        });
 
 
 
@@ -59,6 +82,7 @@ const getRecentActivity = async (req, res) => {
     }
 
 };
+
 
 
 module.exports = {

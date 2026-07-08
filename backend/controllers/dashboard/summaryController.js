@@ -2,6 +2,7 @@ const WeeklyReport = require("../../models/WeeklyReport");
 const User = require("../../models/User");
 const buildReportFilter = require("./filterHelper");
 
+
 const getDashboardSummary = async (req, res) => {
 
     try {
@@ -14,27 +15,25 @@ const getDashboardSummary = async (req, res) => {
 
 
 
-        // Count managers should only see submitted reports
-        const totalReports = await WeeklyReport.countDocuments(filter);
-
-
-        // Count total team members
-        const totalMembers = await User.countDocuments({
-
-            role:"MEMBER"
-
-        });
+        const totalReports =
+            await WeeklyReport.countDocuments(filter);
 
 
 
-        // Calculate pending reports
+        const totalMembers =
+            await User.countDocuments({
+                role:"MEMBER"
+            });
+
+
 
         const pendingReports =
-            totalMembers - totalReports;
+            Math.max(
+                totalMembers - totalReports,
+                0
+            );
 
 
-
-        // Compliance percentage
 
         let complianceRate = 0;
 
@@ -42,14 +41,17 @@ const getDashboardSummary = async (req, res) => {
         if(totalMembers > 0){
 
             complianceRate =
-                ((totalReports / totalMembers) * 100)
-                .toFixed(2);
+                Number(
+                    (
+                        (totalReports / totalMembers)
+                        * 100
+                    )
+                    .toFixed(2)
+                );
 
         }
 
 
-
-        // Calculate blockers
 
         const reports =
             await WeeklyReport.find(filter);
@@ -61,7 +63,8 @@ const getDashboardSummary = async (req, res) => {
 
         reports.forEach(report => {
 
-            openBlockers += report.blockers?.length || 0;
+            openBlockers +=
+                report.blockers?.length || 0;
 
         });
 
@@ -73,9 +76,15 @@ const getDashboardSummary = async (req, res) => {
 
             data:{
 
-                weekStart,
+                weekStart:
+                    weekStart
+                    .toISOString()
+                    .split("T")[0],
 
-                weekEnd,
+                weekEnd:
+                    weekEnd
+                    .toISOString()
+                    .split("T")[0],
 
                 totalReports,
 
@@ -95,15 +104,17 @@ const getDashboardSummary = async (req, res) => {
 
         res.status(500).json({
 
-            success: false,
+            success:false,
 
-            message: error.message
+            message:error.message
 
         });
 
     }
 
 };
+
+
 
 module.exports = {
     getDashboardSummary

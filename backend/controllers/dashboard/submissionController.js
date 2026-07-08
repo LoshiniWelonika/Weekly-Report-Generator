@@ -10,32 +10,33 @@ const getSubmissionStatus = async (req, res) => {
         const today = new Date();
 
 
-        // Calculate current week
         const {
             filter,
-            weekStart,
             weekEnd
         } = buildReportFilter(req.query);
 
 
 
-        // Get all members
         const members = await User.find({
             role:"MEMBER"
         });
 
 
 
-        // Get submitted reports
         const submittedReports =
             await WeeklyReport.find(filter);
 
 
 
-        const submittedUsers =
-            submittedReports.map(
-                report => report.user.toString()
-            );
+        const submittedUsers = new Set(
+
+            submittedReports
+                .filter(report => report.user)
+                .map(report =>
+                    report.user.toString()
+                )
+
+        );
 
 
 
@@ -45,14 +46,24 @@ const getSubmissionStatus = async (req, res) => {
 
 
 
+        const deadline = new Date(weekEnd);
+
+        deadline.setHours(
+            18,
+            0,
+            0,
+            0
+        );
+
+
+
         members.forEach(member => {
 
 
             const hasSubmitted =
-                submittedUsers.includes(
+                submittedUsers.has(
                     member._id.toString()
                 );
-
 
 
             if(hasSubmitted){
@@ -60,36 +71,16 @@ const getSubmissionStatus = async (req, res) => {
                 submitted++;
 
             }
-            else {
+            else if(today > deadline){
 
-
-                // Check deadline
-
-                const deadline =
-                    new Date(weekEnd);
-
-
-                deadline.setHours(
-                    18,
-                    0,
-                    0,
-                    0
-                );
-
-
-                if(today > deadline){
-
-                    late++;
-
-                }
-                else{
-
-                    pending++;
-
-                }
+                late++;
 
             }
+            else{
 
+                pending++;
+
+            }
 
         });
 
@@ -97,13 +88,19 @@ const getSubmissionStatus = async (req, res) => {
 
         res.json({
 
-            submitted,
+            success:true,
 
-            pending,
+            data:{
 
-            late,
+                submitted,
 
-            totalMembers: members.length
+                pending,
+
+                late,
+
+                totalMembers: members.length
+
+            }
 
         });
 
@@ -122,6 +119,7 @@ const getSubmissionStatus = async (req, res) => {
     }
 
 };
+
 
 
 module.exports = {
