@@ -11,6 +11,9 @@ import MemberDashboard from "./pages/member/MemberDashboard";
 
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 
+import MainLayout from "./layouts/MainLayout";
+
+import Unauthorized from "./pages/Unauthorized";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -44,16 +47,18 @@ return (
 
     element={
 
-        <ProtectedRoute role="MEMBER">
+    <ProtectedRoute role="MEMBER">
 
-            <MemberDashboard />
+    <MainLayout>
 
-        </ProtectedRoute>
+    <MemberDashboard />
+
+    </MainLayout>
+
+    </ProtectedRoute>
 
     }
-
 />
-
 
 
 <Route
@@ -62,13 +67,25 @@ return (
 
     element={
 
-        <ProtectedRoute role="MANAGER">
+    <ProtectedRoute role="MANAGER">
 
-            <ManagerDashboard />
+    <MainLayout>
 
-        </ProtectedRoute>
+    <ManagerDashboard />
+
+    </MainLayout>
+
+    </ProtectedRoute>
 
     }
+
+/>
+
+<Route
+
+    path="/unauthorized"
+
+    element={<Unauthorized />}
 
 />
 
