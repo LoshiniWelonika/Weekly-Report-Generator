@@ -35,14 +35,8 @@ const buildReportFilter = (query) => {
     }
 
     const filter = {
-        weekStart: {
-            $gte: weekStart,
-            $lte: weekEnd
-        },
-        weekEnd: {
-            $gte: weekStart,
-            $lte: weekEnd
-        }
+        weekStart: { $lte: weekEnd },
+        weekEnd: { $gte: weekStart }
     };
 
     if (project) {

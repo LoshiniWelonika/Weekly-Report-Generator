@@ -9,7 +9,10 @@ const getRecentActivity = async (req, res) => {
         const { filter } = buildReportFilter(req.query);
 
 
-        const reports = await WeeklyReport.find(filter)
+        const reports = await WeeklyReport.find({
+                ...filter,
+                status: "SUBMITTED"
+            })
 
             .populate("user", "name email")
 

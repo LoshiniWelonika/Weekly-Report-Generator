@@ -6,55 +6,73 @@ const buildReportFilter = require("./filterHelper");
 const getSubmissionStatus = async (req, res) => {
 
     try {
+
+        const today = new Date();
+
         const {
             filter,
+            weekEnd
         } = buildReportFilter(req.query);
 
-        const reports =
-            await WeeklyReport.find(filter);
+        const members = await User.find({
+            role: "MEMBER"
+        });
 
-        const submitted = reports.filter(report => report.status === "SUBMITTED").length;
-        const pending = reports.filter(report => report.status === "PENDING").length;
-        const late = 0;
+        const reports = await WeeklyReport.find(filter);
 
+        const submittedUsers = new Set(
+            reports
+                .filter(report =>
+                    report.user &&
+                    report.status === "SUBMITTED"
+                )
+                .map(report => report.user.toString())
+        );
 
+        let submitted = 0;
+        let pending = 0;
+        let late = 0;
 
-        res.json({
+        const deadline = new Date(weekEnd);
+        deadline.setHours(18, 0, 0, 0);
 
-            success:true,
+        members.forEach(member => {
 
-            data:{
+            const hasSubmitted = submittedUsers.has(member._id.toString());
 
-                submitted,
-
-                pending,
-
-                late,
-
-                totalMembers: await User.countDocuments({
-                    role: "MEMBER"
-                })
-
+            if (hasSubmitted) {
+                submitted++;
+            } else if (today > deadline) {
+                late++;
+            } else {
+                pending++;
             }
 
         });
 
+        res.json({
 
+            success: true,
 
-    } catch(error){
+            data: {
+                submitted,
+                pending,
+                late,
+                totalMembers: members.length
+            }
+
+        });
+
+    } catch (error) {
 
         res.status(500).json({
-
-            success:false,
-
-            message:error.message
-
+            success: false,
+            message: error.message
         });
 
     }
 
 };
-
 
 
 module.exports = {
