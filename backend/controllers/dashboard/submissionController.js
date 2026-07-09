@@ -6,86 +6,16 @@ const buildReportFilter = require("./filterHelper");
 const getSubmissionStatus = async (req, res) => {
 
     try {
-
-        const today = new Date();
-
-
         const {
             filter,
-            weekEnd
         } = buildReportFilter(req.query);
-
-
-
-        const members = await User.find({
-            role:"MEMBER"
-        });
-
-
 
         const reports =
             await WeeklyReport.find(filter);
 
-
-
-        const submittedUsers = new Set(
-
-            reports
-                .filter(report =>
-                    report.user &&
-                    report.status === "SUBMITTED"
-                )
-                .map(report =>
-                    report.user.toString()
-                )
-
-        );
-
-
-
-        let submitted = 0;
-        let pending = 0;
-        let late = 0;
-
-
-
-        const deadline = new Date(weekEnd);
-
-        deadline.setHours(
-            18,
-            0,
-            0,
-            0
-        );
-
-
-
-        members.forEach(member => {
-
-
-            const hasSubmitted =
-                submittedUsers.has(
-                    member._id.toString()
-                );
-
-
-            if(hasSubmitted){
-
-                submitted++;
-
-            }
-            else if(today > deadline){
-
-                late++;
-
-            }
-            else{
-
-                pending++;
-
-            }
-
-        });
+        const submitted = reports.filter(report => report.status === "SUBMITTED").length;
+        const pending = reports.filter(report => report.status === "PENDING").length;
+        const late = 0;
 
 
 
@@ -101,7 +31,9 @@ const getSubmissionStatus = async (req, res) => {
 
                 late,
 
-                totalMembers: members.length
+                totalMembers: await User.countDocuments({
+                    role: "MEMBER"
+                })
 
             }
 
