@@ -3,38 +3,64 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
 const User = require("../models/User");
-const connectDB = require("../config/db");
 
 
-const createManager = async()=>{
+const ensureManager = async () => {
 
-    await connectDB();
+    const managerEmail = process.env.MANAGER_EMAIL || "manager@test.com";
+    const managerPassword = process.env.MANAGER_PASSWORD || "manager123";
 
-
-    const password = await bcrypt.hash(
-        "manager123",
-        10
-    );
-
-
-    await User.create({
-
-        name:"Project Manager",
-
-        email:"manager@test.com",
-
-        password,
-
-        role:"MANAGER"
-
+    const existingManager = await User.findOne({
+        email: managerEmail
     });
 
 
-    console.log("Manager created");
+    if (existingManager) {
+        const hashedPassword = await bcrypt.hash(managerPassword, 10);
 
-    mongoose.connection.close();
+        if (existingManager.role !== "MANAGER" || existingManager.name !== "Project Manager") {
+            existingManager.role = "MANAGER";
+            existingManager.name = "Project Manager";
+            existingManager.password = hashedPassword;
+            await existingManager.save();
+        }
+
+        return existingManager;
+    }
+
+    const hashedPassword = await bcrypt.hash(managerPassword, 10);
+
+
+    return User.create({
+
+        name: "Project Manager",
+
+        email: managerEmail,
+
+        password: hashedPassword,
+
+        role: "MANAGER"
+
+    });
 
 };
 
 
-createManager();
+if (require.main === module) {
+    const connectDB = require("../config/db");
+
+    connectDB()
+        .then(() => ensureManager())
+        .then(() => {
+            console.log("Manager ensured");
+            mongoose.connection.close();
+        })
+        .catch((error) => {
+            console.error(error);
+            mongoose.connection.close();
+            process.exit(1);
+        });
+}
+
+
+module.exports = ensureManager;

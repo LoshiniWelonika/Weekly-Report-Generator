@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Box, Button, Card, CardContent, Divider, Link, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, Divider, Link, Stack, TextField, Typography } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/authApi";
 
@@ -8,7 +8,6 @@ const Register = () => {
         name: "",
         email: "",
         password: "",
-        role: "MEMBER",
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -46,7 +45,7 @@ const Register = () => {
                                 <Box>
                                     <Typography variant="h4">Create account</Typography>
                                     <Typography color="text.secondary" sx={{ mt: 1 }}>
-                                        Register as a member or manager to access the workspace.
+                                        Create a member account to access the workspace.
                                     </Typography>
                                 </Box>
 
@@ -55,11 +54,6 @@ const Register = () => {
                                 <TextField name="name" label="Full name" value={formData.name} onChange={handleChange} required />
                                 <TextField name="email" label="Email" type="email" value={formData.email} onChange={handleChange} required />
                                 <TextField name="password" label="Password" type="password" value={formData.password} onChange={handleChange} required />
-                                <TextField name="role" label="Role" select value={formData.role} onChange={handleChange}>
-                                    <MenuItem value="MEMBER">Team Member</MenuItem>
-                                    <MenuItem value="MANAGER">Manager</MenuItem>
-                                </TextField>
-
                                 <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ py: 1.4 }}>
                                     {loading ? "Creating account..." : "Create account"}
                                 </Button>
