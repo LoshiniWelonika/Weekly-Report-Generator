@@ -8,8 +8,6 @@ const getRecentActivity = async (req, res) => {
 
         const { filter } = buildReportFilter(req.query);
 
-        const limit = Math.min(Number(req.query.limit) || 10, 50);
-
 
         const reports = await WeeklyReport.find(filter)
 
@@ -21,7 +19,7 @@ const getRecentActivity = async (req, res) => {
                 submittedAt: -1
             })
 
-            .limit(limit);
+            .limit(10);
 
 
 
@@ -41,10 +39,6 @@ const getRecentActivity = async (req, res) => {
 
 
                 action: "Submitted weekly report",
-
-                status: report.status,
-
-                reportId: report._id.toString(),
 
 
                 project: report.project

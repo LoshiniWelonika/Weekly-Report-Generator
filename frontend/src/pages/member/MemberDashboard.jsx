@@ -24,7 +24,7 @@ const MemberDashboard = () => {
 
     const totalReports = reports.length;
     const submittedReports = reports.filter((report) => report.status === "SUBMITTED").length;
-    const draftReports = totalReports - submittedReports;
+    const pendingReports = totalReports - submittedReports;
 
     return (
         <Stack spacing={3}>
@@ -41,7 +41,7 @@ const MemberDashboard = () => {
                 {[
                     { label: "Total reports", value: totalReports },
                     { label: "Submitted", value: submittedReports },
-                    { label: "Drafts", value: draftReports },
+                    { label: "Pending", value: pendingReports },
                 ].map((item) => (
                     <Grid item xs={12} md={4} key={item.label}>
                         <Card>

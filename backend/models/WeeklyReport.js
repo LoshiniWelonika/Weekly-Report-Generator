@@ -59,8 +59,8 @@ const weeklyReportSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: ["DRAFT", "SUBMITTED"],
-            default: "DRAFT"
+            enum: ["PENDING", "SUBMITTED"],
+            default: "PENDING"
         },
 
         submittedAt: {

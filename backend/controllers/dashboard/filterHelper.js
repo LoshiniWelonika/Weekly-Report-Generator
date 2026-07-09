@@ -1,6 +1,6 @@
 const buildReportFilter = (query) => {
 
-    let { weekStart, weekEnd, project, member, status } = query;
+    let { weekStart, weekEnd, project, member } = query;
 
     if (!weekStart || !weekEnd) {
 
@@ -32,11 +32,10 @@ const buildReportFilter = (query) => {
     }
 
     const filter = {
+        status: "SUBMITTED",
         weekStart,
         weekEnd
     };
-
-    filter.status = status || "SUBMITTED";
 
     if (project) {
         filter.project = project;
