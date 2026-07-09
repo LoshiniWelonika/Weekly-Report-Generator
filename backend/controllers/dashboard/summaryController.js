@@ -13,8 +13,6 @@ const getDashboardSummary = async (req, res) => {
             weekEnd
         } = buildReportFilter(req.query);
 
-        console.log("Computed range:", weekStart, weekEnd);
-
         const reports =
             await WeeklyReport.find(filter);
 
