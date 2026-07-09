@@ -39,17 +39,8 @@ const createReport = async (req,res)=>{
         await WeeklyReport.findOne({
 
             user:req.user._id,
-
-            weekStart:{
-                $gte:weekStart,
-                $lte:weekStart
-            },
-
-
-            weekEnd:{
-                $gte:weekEnd,
-                $lte:weekEnd
-            }
+            weekStart,
+            weekEnd
 
         });
 

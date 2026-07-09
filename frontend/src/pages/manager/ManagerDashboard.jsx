@@ -7,7 +7,6 @@ import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getDashboardSummary, getProjectWorkload, getRecentActivity, getSubmissionStatus, getTasksTrend } from "../../api/dashboardApi";
 
-// One accent family, used with intent rather than repeated identically across every card.
 const teal = "#0f766e";
 const statusColors = { Submitted: "#0f766e", Pending: "#f59e0b", Late: "#dc2626" };
 
@@ -82,7 +81,7 @@ const ManagerDashboard = () => {
     ];
 
     return (
-        <Stack spacing={4}>
+        <Stack spacing={4} sx={{ width: "100%", maxWidth: "100%" }}>
             <Box>
                 <Typography variant="h4" sx={{ fontWeight: 800 }}>
                     Manager Dashboard
@@ -94,7 +93,7 @@ const ManagerDashboard = () => {
 
             {error ? <Alert severity="error">{error}</Alert> : null}
 
-            <Grid container spacing={3.5} justifyContent="center">
+            <Grid container spacing={3.5}>
                 {stats.map((item) => (
                     <Grid item xs={12} sm={6} lg={3} key={item.label}>
                         <Card
@@ -139,7 +138,15 @@ const ManagerDashboard = () => {
 
             <Grid container spacing={2.5}>
                 <Grid item xs={12} lg={7}>
-                    <Paper elevation={0} sx={{ p: 3, height: 380, border: "1px solid rgba(15,23,42,0.08)", borderRadius: 3 }}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: { xs: 320, md: 400, xl: 460 },
+                            border: "1px solid rgba(15,23,42,0.08)",
+                            borderRadius: 3,
+                        }}
+                    >
                         <SectionLabel>Analytics</SectionLabel>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
                             Tasks completed trend
@@ -163,7 +170,15 @@ const ManagerDashboard = () => {
                 </Grid>
 
                 <Grid item xs={12} lg={5}>
-                    <Paper elevation={0} sx={{ p: 3, height: 380, border: "1px solid rgba(15,23,42,0.08)", borderRadius: 3 }}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            height: { xs: 320, md: 400, xl: 460 },
+                            border: "1px solid rgba(15,23,42,0.08)",
+                            borderRadius: 3,
+                        }}
+                    >
                         <SectionLabel>Analytics</SectionLabel>
                         <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>
                             Submission status
@@ -202,7 +217,7 @@ const ManagerDashboard = () => {
 
             <Grid container spacing={2.5}>
                 <Grid item xs={12} lg={6}>
-                    <Paper elevation={0} sx={{ p: 3, border: "1px solid rgba(15,23,42,0.08)", borderRadius: 3 }}>
+                    <Paper elevation={0} sx={{ p: 3, height: "100%", border: "1px solid rgba(15,23,42,0.08)", borderRadius: 3 }}>
                         <SectionLabel>Team</SectionLabel>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
                             Project workload
@@ -239,7 +254,7 @@ const ManagerDashboard = () => {
                 </Grid>
 
                 <Grid item xs={12} lg={6}>
-                    <Paper elevation={0} sx={{ p: 3, border: "1px solid rgba(15,23,42,0.08)", borderRadius: 3 }}>
+                    <Paper elevation={0} sx={{ p: 3, height: "100%", border: "1px solid rgba(15,23,42,0.08)", borderRadius: 3 }}>
                         <SectionLabel>Team</SectionLabel>
                         <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
                             Recent activity
