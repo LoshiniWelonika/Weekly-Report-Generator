@@ -14,36 +14,39 @@ const getDashboardSummary = async (req, res) => {
         } = buildReportFilter(req.query);
 
 
+        const reports =
+            await WeeklyReport.find(filter);
 
-        const totalReports =
-            await WeeklyReport.countDocuments(filter);
 
+        const totalReports = reports.length;
+
+
+        const submittedReports =
+            reports.filter(
+                report => report.status === "SUBMITTED"
+            ).length;
+
+
+        const pendingReports =
+            reports.filter(
+                report => report.status === "PENDING"
+            ).length;
 
 
         const totalMembers =
             await User.countDocuments({
-                role:"MEMBER"
+                role: "MEMBER"
             });
-
-
-
-        const pendingReports =
-            Math.max(
-                totalMembers - totalReports,
-                0
-            );
-
 
 
         let complianceRate = 0;
 
-
-        if(totalMembers > 0){
+        if (totalMembers > 0) {
 
             complianceRate =
                 Number(
                     (
-                        (totalReports / totalMembers)
+                        (submittedReports / totalMembers)
                         * 100
                     )
                     .toFixed(2)
@@ -52,29 +55,18 @@ const getDashboardSummary = async (req, res) => {
         }
 
 
-
-        const reports =
-            await WeeklyReport.find(filter);
-
-
-
         let openBlockers = 0;
 
-
         reports.forEach(report => {
-
-            openBlockers +=
-                report.blockers?.length || 0;
-
+            openBlockers += report.blockers?.length || 0;
         });
-
 
 
         res.json({
 
-            success:true,
+            success: true,
 
-            data:{
+            data: {
 
                 weekStart:
                     weekStart
@@ -88,6 +80,8 @@ const getDashboardSummary = async (req, res) => {
 
                 totalReports,
 
+                submittedReports,
+
                 pendingReports,
 
                 complianceRate,
@@ -99,21 +93,19 @@ const getDashboardSummary = async (req, res) => {
         });
 
 
-
-    } catch(error){
+    } catch (error) {
 
         res.status(500).json({
 
-            success:false,
+            success: false,
 
-            message:error.message
+            message: error.message
 
         });
 
     }
 
 };
-
 
 
 module.exports = {

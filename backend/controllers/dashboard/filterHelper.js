@@ -8,7 +8,10 @@ const buildReportFilter = (query) => {
 
         const start = new Date(today);
 
-        start.setDate(today.getDate() - today.getDay() + 1);
+        const day = today.getDay();
+        const daysFromMonday = day === 0 ? -6 : 1 - day;
+
+        start.setDate(today.getDate() + daysFromMonday);
 
         start.setHours(0, 0, 0, 0);
 
@@ -32,9 +35,14 @@ const buildReportFilter = (query) => {
     }
 
     const filter = {
-        status: "SUBMITTED",
-        weekStart,
-        weekEnd
+        weekStart: {
+            $gte: weekStart,
+            $lte: weekEnd
+        },
+        weekEnd: {
+            $gte: weekStart,
+            $lte: weekEnd
+        }
     };
 
     if (project) {

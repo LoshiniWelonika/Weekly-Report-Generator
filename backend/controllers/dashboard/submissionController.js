@@ -23,15 +23,18 @@ const getSubmissionStatus = async (req, res) => {
 
 
 
-        const submittedReports =
+        const reports =
             await WeeklyReport.find(filter);
 
 
 
         const submittedUsers = new Set(
 
-            submittedReports
-                .filter(report => report.user)
+            reports
+                .filter(report =>
+                    report.user &&
+                    report.status === "SUBMITTED"
+                )
                 .map(report =>
                     report.user.toString()
                 )
